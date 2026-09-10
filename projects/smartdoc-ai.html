@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartDoc AI — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>SmartDoc AI</h1>
+  <p class="tagline">Ollama 기반 로컬 LLM으로 동작하는 RAG 문서 검색 · 자가교정 AI Agent</p>
+  <div class="tags">
+    <span class="tag">LLM</span>
+    <span class="tag">RAG</span>
+    <span class="tag">LangGraph</span>
+    <span class="tag">MCP</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>2026.07 – 2026.08 (v1~v4 단계적 확장)</td></tr>
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>역할</td><td>RAG 파이프라인, 자가교정 Agent, MCP 서버 설계·구현 전체</td></tr>
+      <tr><td>주요 기술</td><td>Ollama, LangChain, LangGraph, Chroma, FastAPI, Streamlit, MCP</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/smartdoc-ai" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/smartdoc-ai</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>PDF 문서에서 원하는 정보를 직접 찾아야 하는 번거로움</h2>
+    <p>문서 내용을 근거로 질문에 답변해주는 서비스가 필요했습니다. 다만 외부 API에 문서를 보내지 않고, 로컬 LLM(Ollama)만으로 동작하도록 만드는 것을 원칙으로 삼았습니다 — API 비용 없이 자유롭게 실험하고, 문서 내용이 외부로 전송되지 않도록 하기 위해서입니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>PDF 업로드 → 청크 분리 → 임베딩 → 벡터DB(Chroma) 저장까지 기본 RAG 파이프라인 설계</li>
+        <li>LangGraph 기반 자가교정(Corrective RAG) Agent 구현</li>
+        <li>재업로드 시 벡터DB에 청크가 중복 저장되는 버그 발견 및 수정</li>
+        <li>Claude Desktop에서 바로 호출 가능한 MCP 서버 구축 (3개 tool 제공)</li>
+        <li>GitHub push 이벤트 → Google Sheets 커밋 로그 자동 기록 파이프라인(Make) 구성</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>검색 결과가 부족해도 LLM이 그대로 답변을 생성해버리는 문제</h2>
+    <p>기본 RAG는 검색 → 생성을 한 번만 거치는 단순 구조입니다. 검색된 문서가 질문과 잘 맞지 않아도, LLM은 그 문서를 근거로 삼아 부실하거나 부정확한 답변을 만들어낼 수 있다는 한계가 있었습니다.</p>
+    <div class="flow">
+      <div class="node">단일 검색</div><span class="arrow">→</span>
+      <div class="node warn">검색 결과 불충분</div><span class="arrow">→</span>
+      <div class="node warn">그대로 답변 생성 (환각 위험)</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>이 문제를 모델 자체의 한계로 보지 않고, <b>검색 과정 자체를 개선</b>해야 한다고 판단했습니다. LangGraph로 검색 결과가 질문에 답하기 충분한지 LLM이 스스로 채점(sufficient / insufficient)하고, 부족하면 질문을 검색에 더 적합한 형태로 재작성해 다시 검색하는 판단 루프를 추가했습니다 (최대 2회 재시도).</p>
+    <div class="flow">
+      <div class="node">retrieve</div><span class="arrow">→</span>
+      <div class="node">grade_documents</div><span class="arrow">→</span>
+      <div class="node good">충분 → generate</div>
+    </div>
+    <div class="flow">
+      <div class="node">grade_documents</div><span class="arrow">→</span>
+      <div class="node warn">부족 → rewrite_query</div><span class="arrow">→</span>
+      <div class="node">retrieve (재시도)</div>
+    </div>
+    <p style="margin-top:16px;">정해진 파이프라인을 한 번 실행하는 일반 RAG와 달리, 결과에 따라 스스로 경로를 바꾸는 것이 이 구조와 일반 RAG의 핵심적인 차이입니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>단일 검색 구조에서, 검색 결과에 따라 다음 행동을 스스로 결정할 수 있는 Agent 구조로 확장했습니다. Streamlit UI에서 "일반 RAG"와 "Agent 모드"를 토글로 전환하며 두 방식의 답변을 바로 비교해볼 수 있도록 구성했습니다.</p>
+    <div class="detail-img">
+      <img src="https://github.com/sung-ju-park/smartdoc-ai/raw/main/screenshots/20260801_132643.png" alt="Agent 모드 실행 화면">
+    </div>
+    <p class="caption">Agent 모드 — 문서에 있는 정보는 정확히 답변하고, 없는 정보는 지어내지 않고 솔직하게 답변합니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">PDF 업로드</div>
+      <div class="down">↓</div>
+      <div class="node">텍스트 추출 (PyPDFLoader) → 청크 분리 → 임베딩 (Ollama: nomic-embed-text)</div>
+      <div class="down">↓</div>
+      <div class="node">벡터 저장 (Chroma)</div>
+      <div class="down">↓ 질문 입력 시</div>
+      <div class="node">벡터 유사도 검색 → grade_documents</div>
+      <div class="branch" style="margin-top:8px;">
+        <div class="node good">충분 → LLM(qwen2.5:3b) 답변 생성</div>
+        <div class="node warn">부족 → 질문 재구성 → 재검색</div>
+      </div>
+    </div>
+    <p style="margin-top:20px;">이 RAG 로직은 이후 <b>MCP 서버</b>로도 그대로 재사용되어, Claude Desktop이 HTTP 계층 없이 파이썬 함수를 직접 호출하는 구조로 확장되었습니다 (<code style="background:var(--surface);padding:2px 6px;border-radius:4px;">search_documents</code>, <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">ask_document_agent</code>, <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">upload_document</code>).</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/smartdoc-ai" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>

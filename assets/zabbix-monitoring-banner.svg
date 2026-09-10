@@ -1,0 +1,57 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12172b"/>
+      <stop offset="100%" stop-color="#1c2340"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="70%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="300" fill="url(#bg)"/>
+
+  <g opacity="0.15">
+    <circle cx="60" cy="40" r="2" fill="#8892b0"/>
+    <circle cx="120" cy="40" r="2" fill="#8892b0"/>
+    <circle cx="180" cy="40" r="2" fill="#8892b0"/>
+    <circle cx="60" cy="260" r="2" fill="#8892b0"/>
+    <circle cx="120" cy="260" r="2" fill="#8892b0"/>
+    <circle cx="1080" cy="40" r="2" fill="#8892b0"/>
+    <circle cx="1140" cy="40" r="2" fill="#8892b0"/>
+    <circle cx="1080" cy="260" r="2" fill="#8892b0"/>
+    <circle cx="1140" cy="260" r="2" fill="#8892b0"/>
+  </g>
+
+  <g transform="translate(720,150)">
+    <polyline points="0,60 40,55 80,58 120,52 160,20 200,-30 240,-55 280,-58 320,-20 360,30 400,50 440,52"
+      fill="none" stroke="url(#lineGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="240" cy="-55" r="6" fill="#ef4444"/>
+    <text x="240" y="-72" text-anchor="middle" fill="#ef4444" font-family="Arial, sans-serif" font-size="16" font-weight="bold">99%</text>
+  </g>
+
+  <g transform="translate(90,110)">
+    <rect x="0" y="40" width="60" height="34" rx="6" fill="#2563eb" opacity="0.85"/>
+    <rect x="20" y="20" width="60" height="34" rx="6" fill="#3b82f6" opacity="0.9"/>
+    <rect x="40" y="0" width="60" height="34" rx="6" fill="#60a5fa"/>
+  </g>
+
+  <text x="90" y="200" fill="#ffffff" font-family="Noto Sans CJK KR, Arial, sans-serif" font-size="42" font-weight="bold">Zabbix Docker Monitoring Lab</text>
+  <text x="90" y="235" fill="#9aa5c9" font-family="Noto Sans CJK KR, Arial, sans-serif" font-size="20">Docker Compose + Zabbix API 자동화 기반 인프라 모니터링</text>
+
+  <g font-family="Noto Sans CJK KR, Arial, sans-serif" font-size="15" font-weight="bold">
+    <rect x="90" y="252" width="70" height="28" rx="14" fill="#1d2547" stroke="#3b82f6" stroke-width="1"/>
+    <text x="125" y="271" fill="#93c5fd" text-anchor="middle">Docker</text>
+
+    <rect x="170" y="252" width="80" height="28" rx="14" fill="#1d2547" stroke="#f97316" stroke-width="1"/>
+    <text x="210" y="271" fill="#fdba74" text-anchor="middle">Zabbix</text>
+
+    <rect x="260" y="252" width="70" height="28" rx="14" fill="#1d2547" stroke="#22c55e" stroke-width="1"/>
+    <text x="295" y="271" fill="#86efac" text-anchor="middle">Python</text>
+
+    <rect x="340" y="252" width="70" height="28" rx="14" fill="#1d2547" stroke="#a78bfa" stroke-width="1"/>
+    <text x="375" y="271" fill="#c4b5fd" text-anchor="middle">MySQL</text>
+  </g>
+</svg>

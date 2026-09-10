@@ -1,0 +1,70 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14102b"/>
+      <stop offset="55%" stop-color="#3a2a72"/>
+      <stop offset="100%" stop-color="#5b4fe9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg2)"/>
+
+  <g fill="#ffffff">
+    <circle cx="40" cy="30" r="2" opacity="0.18"/>
+    <circle cx="180" cy="70" r="1.6" opacity="0.14"/>
+    <circle cx="320" cy="40" r="2.2" opacity="0.2"/>
+    <circle cx="500" cy="90" r="1.5" opacity="0.15"/>
+    <circle cx="650" cy="35" r="2" opacity="0.16"/>
+    <circle cx="60" cy="200" r="1.8" opacity="0.16"/>
+    <circle cx="250" cy="250" r="1.5" opacity="0.12"/>
+    <circle cx="120" cy="420" r="2" opacity="0.15"/>
+    <circle cx="300" cy="480" r="1.6" opacity="0.14"/>
+    <circle cx="500" cy="560" r="2" opacity="0.17"/>
+    <circle cx="700" cy="600" r="1.5" opacity="0.13"/>
+    <circle cx="900" cy="560" r="1.8" opacity="0.15"/>
+    <circle cx="1050" cy="500" r="2" opacity="0.16"/>
+    <circle cx="1120" cy="380" r="1.6" opacity="0.14"/>
+    <circle cx="980" cy="230" r="1.8" opacity="0.15"/>
+    <circle cx="1150" cy="120" r="1.5" opacity="0.13"/>
+  </g>
+
+  <g opacity="0.9">
+    <circle cx="960" cy="230" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="8"/>
+    <path d="M 960 285 Q 960 340 1010 340 Q 1050 340 1050 300 L 1050 260" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="1050" cy="245" r="14" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="8"/>
+  </g>
+  <g opacity="0.85" stroke="#ffffff" stroke-opacity="0.5" stroke-width="9" stroke-linecap="round">
+    <line x1="850" y1="430" x2="850" y2="470"/>
+    <line x1="880" y1="405" x2="880" y2="495"/>
+    <line x1="910" y1="380" x2="910" y2="520"/>
+    <line x1="940" y1="415" x2="940" y2="485"/>
+    <line x1="970" y1="395" x2="970" y2="505"/>
+    <line x1="1000" y1="425" x2="1000" y2="475"/>
+    <line x1="1030" y1="410" x2="1030" y2="490"/>
+    <line x1="1060" y1="435" x2="1060" y2="465"/>
+  </g>
+
+  <rect x="80" y="150" width="200" height="44" rx="22" fill="#ffffff"/>
+  <text x="103" y="179" font-family="'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif" font-size="22" font-weight="800" fill="#3b2e96">MEDICAL AI</text>
+
+  <text x="78" y="290" font-family="'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif" font-size="72" font-weight="900" fill="#ffffff">Medical Voice</text>
+  <text x="78" y="368" font-family="'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif" font-size="72" font-weight="900" fill="#ffffff">Charting</text>
+
+  <text x="80" y="418" font-family="'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif" font-size="28" font-weight="500" fill="#e1dcfa">Whisper(STT) + 로컬 LLM으로 진료 구술을 SOAP 노트로 자동 정리</text>
+
+  <g font-family="'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif" font-size="22" font-weight="700" fill="#ffffff">
+    <rect x="80" y="534" width="130" height="46" rx="23" fill="#ffffff" opacity="0.12" stroke="#ffffff" stroke-opacity="0.35"/>
+    <text x="103" y="565">Whisper</text>
+
+    <rect x="224" y="534" width="122" height="46" rx="23" fill="#ffffff" opacity="0.12" stroke="#ffffff" stroke-opacity="0.35"/>
+    <text x="247" y="565">Ollama</text>
+
+    <rect x="360" y="534" width="150" height="46" rx="23" fill="#ffffff" opacity="0.12" stroke="#ffffff" stroke-opacity="0.35"/>
+    <text x="383" y="565">SOAP Note</text>
+
+    <rect x="524" y="534" width="150" height="46" rx="23" fill="#ffffff" opacity="0.12" stroke="#ffffff" stroke-opacity="0.35"/>
+    <text x="547" y="565">Streamlit</text>
+  </g>
+
+  <text x="1120" y="55" text-anchor="end" font-family="'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif" font-size="20" fill="#ffffff" opacity="0.55">github.com/sung-ju-park/medical-voice-charting</text>
+</svg>

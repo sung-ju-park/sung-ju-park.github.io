@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zabbix Docker Monitoring Lab — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Zabbix Docker Monitoring Lab — 박성주">
+<meta property="og:description" content="Docker Compose 기반 Zabbix 모니터링 스택 구축 및 REST API 자동화">
+<meta property="og:image" content="https://sung-ju-park.github.io/assets/og-image.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>Zabbix Docker Monitoring Lab</h1>
+  <p class="tagline">Docker 기반 Zabbix 모니터링 스택 구축, REST API로 등록 자동화하고 부하 테스트로 직접 검증</p>
+  <div class="tags">
+    <span class="tag">Docker</span>
+    <span class="tag">Zabbix</span>
+    <span class="tag">Python</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>역할</td><td>모니터링 스택 구성, REST API 자동화, 부하 테스트 검증 전체</td></tr>
+      <tr><td>주요 기술</td><td>Docker, Docker Compose, Zabbix, Python(REST API)</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/zabbix-monitoring" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/zabbix-monitoring</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>장애가 생겼을 때 사람이 일일이 확인하는 대신, 시스템이 스스로 진단하는 구조</h2>
+    <p>시스템에 이상이 생겼을 때 누군가 계속 화면을 들여다보고 있어야 한다면 장애 대응이 늦어질 수밖에 없습니다. 호스트·트리거·알림이 유기적으로 연결된 모니터링 체계를 직접 구축하고, 그 알림이 정말로 동작하는지까지 확인하고 싶었습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>Docker Compose로 Zabbix 모니터링 스택(서버 / DB / 웹UI / 에이전트) 구성</li>
+        <li>Zabbix REST API를 활용한 호스트·템플릿 등록 자동화 스크립트(Python) 개발</li>
+        <li>CPU 부하 테스트를 통한 임계치 트리거·알림 동작 검증</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>트리거를 설정해두는 것과, 그게 실제로 동작하는 것은 다른 문제입니다</h2>
+    <p>웹 UI에서 호스트와 트리거를 하나씩 수동으로 등록하는 방식은 호스트가 늘어날수록 반복 작업과 실수 가능성이 커집니다. 또한 트리거·알림 설정을 마쳤다고 해서 실제 장애 상황에서 정말로 알림이 오는지는 별개의 문제라는 점도 검증이 필요했습니다.</p>
+    <div class="flow">
+      <div class="node">수동 호스트/트리거 등록</div><span class="arrow">→</span>
+      <div class="node warn">호스트 늘어날수록 반복 작업·실수 위험</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>Zabbix REST API를 활용해 호스트·템플릿 등록을 스크립트 한 번 실행으로 처리하도록 자동화했습니다. 이어서 실제로 CPU 부하를 발생시키는 테스트를 통해, 설정해둔 임계치 트리거가 정확한 시점에 작동하고 알림까지 이어지는지 end-to-end로 직접 검증했습니다.</p>
+    <div class="flow">
+      <div class="node">REST API 등록 스크립트 작성</div><span class="arrow">→</span>
+      <div class="node">CPU 부하 테스트 실행</div><span class="arrow">→</span>
+      <div class="node good">트리거·알림 동작 확인</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>수동 등록 없이 스크립트만으로 호스트·템플릿을 등록할 수 있는 구조를 만들었고, 무엇보다 "설정해뒀으니 될 것이다"에서 멈추지 않고 실제 부하를 걸어 트리거·알림이 진짜로 동작하는지 직접 확인했습니다. 설정과 검증을 분리하지 않고 함께 확인하는 습관을 이 프로젝트에서 익혔습니다.</p>
+    <div class="detail-img">
+      <img src="../assets/zabbix-monitoring-banner.svg" alt="Zabbix Docker Monitoring Lab 배너">
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">Docker Compose — Zabbix Server / DB / Web UI / Agent</div>
+      <div class="down">↓</div>
+      <div class="node">Python 스크립트 — REST API로 호스트·템플릿 자동 등록</div>
+      <div class="down">↓ 부하 테스트 시</div>
+      <div class="node">CPU 부하 발생 → 임계치 트리거 작동</div>
+      <div class="down">↓</div>
+      <div class="node good">알림(Alert) 발송 확인</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/zabbix-monitoring" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>

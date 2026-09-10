@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookHub — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>BookHub</h1>
+  <p class="tagline">서울시 도서관 통합 검색 및 AI 기반 도서 추천 플랫폼 (팀 프로젝트)</p>
+  <div class="tags">
+    <span class="tag">Node.js</span>
+    <span class="tag">LLM</span>
+    <span class="tag">MongoDB</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>2026</td></tr>
+      <tr><td>인원</td><td>5인 팀 (팀명 P1J4)</td></tr>
+      <tr><td>역할</td><td>도서 검색, AI 추천·요약, 회원가입/로그인, 마이페이지 개발 (본인 담당분)</td></tr>
+      <tr><td>주요 기술</td><td>Node.js, HTML/CSS, MongoDB, LLM</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/BookHub" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/BookHub</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>원하는 책이 어느 도서관에 있는지 찾기 번거로움</h2>
+    <p>서울시 내 강남구·강동구·마포구·영등포구 등 여러 구립 도서관의 소장 정보를 각각 따로 확인해야 하는 불편함에서 출발했습니다. 도서관을 한 곳씩 검색하지 않고, 한 화면에서 원하는 책의 소장 여부와 위치를 확인할 수 있는 플랫폼을 만들었습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>도서 검색 및 도서관별 소장 여부 확인 기능 개발</li>
+        <li>AI 기반 도서 추천·요약 기능 개발</li>
+        <li>회원가입/로그인, 마이페이지(최근 본 책, 정보 수정) 기능 개발</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>AI 요약이 책의 실제 내용과 다른 정보를 만들어낼 위험</h2>
+    <p>키워드 기반으로 도서를 추천하고 요약을 생성하는 기능에서는, 모델이 실제 책 내용과 무관한 내용을 그럴듯하게 만들어낼 수 있다는 위험이 항상 따라옵니다. 검색·추천 결과가 실제 도서 데이터에 근거하도록 연결하는 것이 핵심 과제였습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>도서관 API로 확보한 실제 도서 정보(제목, 저자, 소장 도서관)를 기반으로 검색·추천 로직을 구성하고, 그 위에 AI 요약 기능을 얹는 구조로 설계했습니다. 회원가입/로그인과 마이페이지를 통해 사용자가 최근 검색한 책을 다시 확인할 수 있도록 연결했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>서울시 주요 구립 도서관의 도서를 한 번에 검색하고, AI 추천·요약까지 받아볼 수 있는 웹 플랫폼으로 완성했습니다. 로그인, 도서 검색, 상세정보, 마이페이지까지 하나의 흐름으로 연결했습니다.</p>
+    <div class="detail-img">
+      <img src="../assets/bookhub-cover.png" alt="Book Hub 프로젝트 표지">
+    </div>
+    <p class="caption">팀 발표자료 표지 — 팀명 P1J4</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">사용자 — 도서 검색 / 키워드 입력</div>
+      <div class="down">↓</div>
+      <div class="node">Node.js 서버 — 도서관 API 연동, 소장 여부 조회</div>
+      <div class="down">↓</div>
+      <div class="node">MongoDB — 도서 정보 · 사용자 데이터 저장</div>
+      <div class="down">↓</div>
+      <div class="node good">AI 추천·요약 결과 반환</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/BookHub" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>

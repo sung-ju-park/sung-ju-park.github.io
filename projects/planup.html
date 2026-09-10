@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLAN UP — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>PLAN UP</h1>
+  <p class="tagline">취업준비생을 위한 채용·자격증 일정관리 앱 (팀 프로젝트)</p>
+  <div class="tags">
+    <span class="tag">FastAPI</span>
+    <span class="tag">Python</span>
+    <span class="tag">React Native</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>팀 프로젝트</td></tr>
+      <tr><td>인원</td><td>4인 팀 (기획·디자인 1, 프론트엔드/백엔드 2, 크롤링·일정 담당 본인)</td></tr>
+      <tr><td>역할</td><td>채용 공고 크롤링, FastAPI 크롤링 서버, 일정 추가 기능·DB 개발</td></tr>
+      <tr><td>주요 기술</td><td>Python, FastAPI, React Native, MongoDB</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/PlanUP_frontend" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/PlanUP_frontend</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>채용 공고마다 마감일을 일일이 확인해야 하는 번거로움</h2>
+    <p>취업을 준비하다 보면 여러 사이트에 흩어진 채용 공고와 자격증 시험 일정을 각각 따로 확인하고 기억해야 합니다. 이 불편함에서 출발해, 공고 URL 하나만 입력하면 정보와 마감일이 캘린더에 자동으로 반영되는 앱을 팀으로 기획·개발했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>파이썬 기반 채용 공고 크롤링 코드 작성</li>
+        <li>FastAPI 크롤링 서버 구축</li>
+        <li>채용 공고 상세 페이지, 일정 추가 기능, 관련 DB 개발</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>채용 사이트마다 페이지 구조가 달라, 하나의 크롤러로 일정을 안정적으로 뽑아내기 어려움</h2>
+    <p>구직 사이트마다 공고 페이지의 HTML 구조와 마감일 표기 방식이 제각각이라, 단순히 텍스트를 긁어오는 방식으로는 안정적으로 정보를 추출하기 어려웠습니다. URL을 입력받아 필요한 정보(제목, 기업정보, 마감일)만 정확히 골라내는 크롤링 로직 설계가 핵심 과제였습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>FastAPI로 별도의 크롤링 서버를 구축해, 프론트엔드(React Native)와 크롤링 로직을 분리했습니다. 공고 URL을 받으면 서버가 페이지를 파싱해 제목·기업정보·마감일을 추출하고, 사용자가 이를 캘린더 일정과 체크리스트로 바로 저장할 수 있도록 DB와 API를 설계했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>채용 공고 URL만 넣으면 마감일이 자동으로 캘린더에 반영되는 구조를 구현했습니다. 팀 프로젝트로 완성해 실제로 Google Play Store에 배포까지 진행했습니다.</p>
+    <div class="detail-img">
+      <img src="https://github.com/sung-ju-park/PlanUP_frontend/raw/main/%EA%B5%AC%EB%8F%99%ED%99%94%EB%A9%B4.gif" alt="PLAN UP 구동 화면">
+    </div>
+    <p class="caption">실제 앱 구동 화면</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">사용자 — 채용 공고 URL 입력 (React Native)</div>
+      <div class="down">↓</div>
+      <div class="node">FastAPI 크롤링 서버 — 페이지 파싱, 정보 추출</div>
+      <div class="down">↓</div>
+      <div class="node">MongoDB — 공고 정보·일정 저장</div>
+      <div class="down">↓</div>
+      <div class="node good">캘린더 — 마감일·체크리스트 자동 반영</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/PlanUP_frontend" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>

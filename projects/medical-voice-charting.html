@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Voice Charting — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Medical Voice Charting — 박성주">
+<meta property="og:description" content="Whisper(STT) + 로컬 LLM으로 진료 구술을 SOAP 노트로 자동 정리하는 프로토타입">
+<meta property="og:image" content="https://sung-ju-park.github.io/assets/og-image.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>Medical Voice Charting</h1>
+  <p class="tagline">Whisper(STT) + 로컬 LLM으로 진료 구술을 SOAP 노트로 자동 정리하는 프로토타입</p>
+  <div class="tags">
+    <span class="tag">Whisper</span>
+    <span class="tag">Ollama</span>
+    <span class="tag">Python</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>역할</td><td>Whisper 기반 음성 전사 구현, 로컬 LLM으로 SOAP 형식 구조화 전체</td></tr>
+      <tr><td>주요 기술</td><td>Whisper, Ollama, Python</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/medical-voice-charting" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/medical-voice-charting</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>의료진이 진료 내용을 직접 기록·정리하는 반복적인 작업 부담</h2>
+    <p>진료 중 구술한 내용을 의료진이 매번 직접 타이핑해 정리해야 하는 번거로움에서 출발했습니다. 음성을 실시간으로 텍스트로 바꾸고, 그 텍스트를 의료 현장에서 쓰는 SOAP(Subjective/Objective/Assessment/Plan) 형식으로 자동 정리해주는 프로토타입을 만드는 것이 목표였습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>Whisper 기반 음성 전사(STT) 구현</li>
+        <li>로컬 LLM(Ollama)으로 전사 텍스트를 SOAP 형식으로 구조화하는 프롬프트·파이프라인 설계</li>
+        <li>의료 용어 인식 오류 케이스 확인 및 검증 필요성 도출</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>"인후통"처럼 의료 용어가 다른 단어로 잘못 인식되는 문제</h2>
+    <p>개발 과정에서 Whisper가 "인후통" 같은 의료 전문 용어를 다른 단어로 잘못 전사하는 경우를 직접 확인했습니다. 일반 대화용으로 학습된 음성인식 모델이 의료 도메인 특화 용어에서는 정확도가 떨어질 수 있다는 걸 실제 사례로 마주한 것입니다.</p>
+    <div class="flow">
+      <div class="node">진료 구술 음성 입력</div><span class="arrow">→</span>
+      <div class="node warn">Whisper 전사 시 의료용어 오인식</div><span class="arrow">→</span>
+      <div class="node warn">SOAP 노트에 잘못된 내용 반영 위험</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>이 경험을 통해 <b>AI 모델의 결과를 그대로 사용하는 것이 아니라, 실제 업무 환경에서 발생할 수 있는 오류를 고려한 검증과 후처리가 필요하다</b>는 결론을 얻었습니다. 모델 출력을 최종 결과로 바로 쓰지 않고, 의료 용어 오인식 가능성을 열어둔 채로 다음 단계(SOAP 구조화)를 설계하는 방향으로 접근했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>음성 입력부터 SOAP 형식 노트 출력까지 이어지는 프로토타입을 완성했습니다. 무엇보다 이 과정에서 얻은 <b>"AI 출력을 무조건 신뢰하지 않고 실제 환경의 오류 가능성을 함께 설계에 반영한다"</b>는 관점은, 이후 SmartDoc AI의 자가교정 구조를 설계할 때도 그대로 이어졌습니다.</p>
+    <div class="detail-img">
+      <img src="../assets/medical-voice-charting-banner.svg" alt="Medical Voice Charting 배너">
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">진료 구술 음성 입력</div>
+      <div class="down">↓</div>
+      <div class="node">Whisper — 실시간 음성 전사 (STT)</div>
+      <div class="down">↓</div>
+      <div class="node">로컬 LLM (Ollama) — SOAP 형식 구조화 프롬프트</div>
+      <div class="down">↓</div>
+      <div class="node good">Subjective / Objective / Assessment / Plan 노트 출력</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/medical-voice-charting" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>

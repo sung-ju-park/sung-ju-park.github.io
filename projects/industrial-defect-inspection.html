@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrial Defect Inspection — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Industrial Defect Inspection — 박성주">
+<meta property="og:description" content="지도학습(YOLOv8) vs 비지도학습(PatchCore) 산업 결함 검사 비교, pixel 단위 실패 원인 분석">
+<meta property="og:image" content="https://sung-ju-park.github.io/assets/og-image.png">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .vs-wrap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 24px 0; }
+  .vs-card { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+  .vs-card h4 { font-size: 17px; margin-bottom: 6px; }
+  .vs-card .method { font-size: 13px; color: var(--text-faint); margin-bottom: 18px; }
+  .vs-card .metric { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .vs-card .metric:last-child { border-bottom: none; }
+  .vs-card .metric b { color: var(--text); }
+  .vs-mid { display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--text-faint); font-size: 14px; }
+  .vs-card.win .metric.highlight b { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>Industrial Defect Inspection</h1>
+  <p class="tagline">지도학습(YOLOv8) vs 비지도학습(PatchCore) 산업 결함 검사 비교, pixel 단위 실패 원인 분석까지</p>
+  <div class="tags">
+    <span class="tag">YOLOv8</span>
+    <span class="tag">PatchCore</span>
+    <span class="tag">MVTec AD</span>
+    <span class="tag">Error Analysis</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>2026.08</td></tr>
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>역할</td><td>전처리, 두 모델 학습·평가, 오탐/미탐 원인 분석 전체</td></tr>
+      <tr><td>주요 기술</td><td>Python, PyTorch, anomalib(PatchCore), YOLOv8, OpenCV</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/industrial-defect-inspection" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/industrial-defect-inspection</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>산업 검사 현장은 "이미 아는 결함"과 "예상 못한 새 이상"을 동시에 잡아내야 합니다</h2>
+    <p>객체탐지 모델은 학습된 결함 유형은 잘 잡지만 본 적 없는 이상은 놓치기 쉽고, 이상탐지 모델은 정상과 다르면 다 잡아내지만 정확히 어디가 왜 문제인지 짚어내기 어렵다는 상반된 한계가 있습니다. 같은 데이터(MVTec AD hazelnut)로 지도학습(YOLOv8)과 비지도학습(PatchCore)을 각각 구현해 직접 비교하고, 두 접근의 실제 강약점을 데이터로 확인하고자 했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>CLAHE 기반 조명 보정 전처리 파이프라인 구현</li>
+        <li>PatchCore(anomalib) 학습·평가, coreset ratio(1%/10%) 민감도 검증</li>
+        <li>마스크 → YOLO bbox 변환, YOLOv8 학습(Colab T4, 100 epoch)</li>
+        <li>pixel 단위 IoU 분석 및 오탐/미탐 원인 로그 분석</li>
+        <li>두 모델 결과를 종합 비교하는 스크립트 작성</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>이미지 단위 정확도만으로는 두 모델의 진짜 차이가 보이지 않았습니다</h2>
+    <p>PatchCore는 image_AUROC 1.000으로 사실상 완벽하게 정상/불량을 구분했습니다. 이 숫자만 보면 "다 잘 된 것"처럼 보이지만, 결함의 정확한 위치까지 맞히는지는 이미지 단위 지표로는 전혀 알 수 없었습니다.</p>
+    <div class="flow">
+      <div class="node">image_AUROC 1.000 확인</div><span class="arrow">→</span>
+      <div class="node warn">"완벽하다"고 오판할 위험</div><span class="arrow">→</span>
+      <div class="node">pixel 단위로 다시 검증 필요</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>이미지 단위 판정에서 멈추지 않고, <b>pixel 단위 IoU</b>로 다시 뜯어봤습니다. 그 결과 PatchCore는 불량 이미지 70장 평균 IoU 0.193(최저 0.032)로, 결함이 있다는 것은 맞히지만 정확한 위치는 체계적으로 못 짚어낸다는 걸 확인했습니다. 같은 방식으로 YOLOv8도 결함 유형별로 나눠 재평가했습니다.</p>
+
+    <div class="vs-wrap">
+      <div class="vs-card win">
+        <h4>PatchCore</h4>
+        <div class="method">비지도학습 · 이상탐지</div>
+        <div class="metric highlight"><span>image_AUROC</span><b>1.000</b></div>
+        <div class="metric highlight"><span>image_F1</span><b>0.993</b></div>
+        <div class="metric"><span>pixel_AUROC</span><b>0.988</b></div>
+        <div class="metric"><span>pixel_F1</span><b>0.633</b></div>
+        <div class="metric"><span>평균 pixel IoU (불량 70장)</span><b>0.193</b></div>
+        <div class="metric"><span>IoU 최저값</span><b>0.032 (cut)</b></div>
+      </div>
+      <div class="vs-mid">VS</div>
+      <div class="vs-card win">
+        <h4>YOLOv8</h4>
+        <div class="method">지도학습 · 객체탐지</div>
+        <div class="metric highlight"><span>전체 mAP50</span><b>0.869</b></div>
+        <div class="metric highlight"><span>cut / hole / print mAP50</span><b>~0.995</b></div>
+        <div class="metric"><span>crack recall</span><b>0.143</b></div>
+        <div class="metric"><span>종합 F1</span><b>0.714</b></div>
+        <div class="metric"><span>학습 환경</span><b>Colab T4 · 100 epoch</b></div>
+      </div>
+    </div>
+    <p>두 모델은 <b>정확히 반대 지점에서 약했습니다</b> — PatchCore는 <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">cut</code> 결함의 위치를 못 짚었고(IoU 0.032), YOLOv8은 가늘고 긴 <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">crack</code> 결함을 거의 놓쳤습니다(recall 0.143). 축 정렬 바운딩박스 구조 자체가 가늘고 긴 형태를 표현하기 어렵다는 것이 원인으로 보입니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>종합 F1 기준으로는 PatchCore(0.993)가 YOLOv8(0.714)보다 높게 나왔지만, 이 숫자 하나로 "PatchCore가 더 낫다"고 결론 내리지 않았습니다. cut/hole/print처럼 형태가 뚜렷한 결함은 YOLOv8이 거의 완벽하게(mAP50 ~0.995) 잡아내는 반면, PatchCore는 정상 여부 판단은 정확해도 위치 특정은 약하다는 것 — 즉 <b>두 모델이 서로 다른 상황에서 강점을 갖는 상호보완적 관계</b>라는 것이 이 프로젝트의 핵심 발견입니다. 추가로 coreset ratio를 1%와 10%로 바꿔 실험한 결과 성능 차이가 거의 없어, 이후 실험은 1%로 반복 속도를 높였습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">MVTec AD (hazelnut) 원본 이미지</div>
+      <div class="down">↓</div>
+      <div class="node">CLAHE 기반 조명 보정 전처리</div>
+      <div class="down">↓ 두 갈래로 분기</div>
+      <div class="branch">
+        <div class="node good">anomalib PatchCore 학습 → 이상탐지</div>
+        <div class="node good">마스크→bbox 변환 → YOLOv8 학습 → 객체탐지</div>
+      </div>
+      <div class="down">↓</div>
+      <div class="node">image 단위 + pixel 단위 지표로 종합 평가·비교</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/industrial-defect-inspection" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>
