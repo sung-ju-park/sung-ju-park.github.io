@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Fit Scanner — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>Job Fit Scanner</h1>
+  <p class="tagline">채용공고 수백 건을 자동으로 모으고, LLM이 내 이력과의 적합도를 평가해 상위 공고만 보여주는 도구</p>
+  <div class="tags">
+    <span class="tag">업무 자동화</span>
+    <span class="tag">LLM 평가</span>
+    <span class="tag">크롤링</span>
+    <span class="tag">검증</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>2026.10</td></tr>
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>역할</td><td>문제 정의, 설계 판단, 검증 전체. 구현은 ChatGPT·Claude와 함께 진행</td></tr>
+      <tr><td>주요 기술</td><td>Python, requests, BeautifulSoup, Tesseract OCR, Gemini API, SQLite</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/job-fit-scanner" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/job-fit-scanner</a></td></tr>
+    </table>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>조건을 걸어 검색해도 공고가 9,600건이었습니다</h2>
+    <p>사람인에서 서울·경기·충남, IT개발·데이터로 검색하면 9,600건이 나왔습니다. 하나씩 열어보는 건 불가능했고, 제목만 보고 고르면 본문 깊숙이 "경력 3년 이상"이 적힌 공고에 시간을 쓰게 됐습니다. 그래서 공고 본문까지 읽고 1차로 걸러주는 단계를 자동화하기로 했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 My Role</div>
+    <div class="contribution">
+      <h4>My Contribution</h4>
+      <ul>
+        <li>검색 URL 하나로 목록 수집 → 본문 수집 → 규칙 필터 → LLM 평가 → 리포트까지 한 번에 도는 파이프라인 설계</li>
+        <li>로컬 LLM과 Gemini를 같은 공고로 비교해 속도와 정확도를 근거로 모델 결정</li>
+        <li>여러 직무를 한 번에 뽑는 공고를 가장 맞는 직무 하나로 평가하도록 프롬프트 설계</li>
+        <li>AI 점수를 사람 판단 20건과 비교하는 검증 단계 설계, 결과를 보며 입력 길이 문제를 찾아 수정</li>
+        <li>요청 간격·휴식·자동 중단과 이용약관·robots.txt 확인으로 사이트 부담 최소화</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>AI가 준 점수를 그대로 믿어도 되는가</h2>
+    <p>평가 결과를 직접 확인하다가, 지원하려던 직무가 아닌 다른 직무 기준으로 점수가 매겨진 공고를 발견했습니다. 원하던 직무는 공고 본문 6,500자 이후에 있었는데, 처음에 로컬 모델에 맞춰 둔 4,000자 제한 때문에 Gemini가 그 부분을 아예 보지 못한 것이었습니다.</p>
+    <div class="flow">
+      <div class="node">공고 본문 10,400자</div><span class="arrow">→</span>
+      <div class="node warn">앞 4,000자만 전달</div><span class="arrow">→</span>
+      <div class="node warn">다른 직무 기준으로 62점</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>모델에게 문제가 있다고 보지 않고, <b>입력을 어떻게 만들어 보내는지</b>를 다시 봤습니다. 본문 길이 제한을 모델별로 나눠 Gemini에는 15,000자까지 보내고, 이미 잘린 채 평가된 27건만 골라 다시 평가했습니다. 400건 전체를 다시 돌리지 않아 무료 API 한도도 아꼈습니다.</p>
+    <div class="flow">
+      <div class="node">모델별 길이 제한</div><span class="arrow">→</span>
+      <div class="node">잘렸던 27건만 재평가</div><span class="arrow">→</span>
+      <div class="node">원하던 직무 기준 85점</div>
+    </div>
+    <p style="margin-top:16px;">그 밖에 자동화 브라우저 접속이 첫 요청부터 막혔을 때는, 일반 브라우저로 원인을 좁힌 뒤 우회하지 않고 페이지가 본문을 불러오는 주소를 찾아 가벼운 일반 요청으로 바꿨습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>조건 검색 결과 403건 전체를 공고당 약 2초에 평가하고, 상위 30건을 점수와 이유, 관련 경험, 부족한 점과 함께 보여줍니다. 처음 한 번 전체를 훑은 뒤에는 새로 올라온 공고만 처리합니다.</p>
+    <div class="detail-img">
+      <img src="../assets/job-fit-scanner-report.png" alt="Job Fit Scanner 실행 결과 리포트">
+    </div>
+    <p class="caption">실제 실행 결과 화면. 점수와 평가 내용은 그대로이고 회사명·공고 제목만 가렸습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Validation</div>
+    <h2>사람 판단 20건과 비교했습니다</h2>
+    <p>평가된 공고 중 20건을 점수 구간별로 고르게 뽑아 지원·보류·제외를 판단하고, AI 판단과 비교했습니다.</p>
+    <table class="overview-table" style="margin-top:16px;">
+      <tr><td>3단계 일치율</td><td><b>75%</b> (20건 중 15건)</td></tr>
+      <tr><td>한 단계 이내</td><td><b>95%</b> (지원과 제외처럼 정반대로 엇갈린 건 1건)</td></tr>
+      <tr><td>Cohen's kappa</td><td><b>0.63</b></td></tr>
+      <tr><td>놓친 지원 공고</td><td><b>0건</b> (지원하려던 7건 중 AI가 제외한 공고 없음)</td></tr>
+    </table>
+    <p style="margin-top:16px;">엇갈린 사례에서는 AI가 "지원할 수 있는가"를, 사람이 "지원하고 싶은가"를 기준으로 본다는 차이가 보였고, 점수 기준과 판단 구간의 경계가 어긋난 설계상 문제도 찾아 개선 방향으로 정리했습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">사람인 검색 URL</div>
+      <div class="down">↓</div>
+      <div class="node">목록 수집 (공고 번호·제목·회사, SQLite에 중복 없이 저장)</div>
+      <div class="down">↓</div>
+      <div class="node">본문 수집 (iframe 공고, 이미지 공고는 Tesseract OCR)</div>
+      <div class="down">↓</div>
+      <div class="node">사전 필터 (필수 경력 연차 규칙)</div>
+      <div class="down">↓</div>
+      <div class="node">LLM 평가 (공고 본문 + 내 프로필 → Gemini → 점수·근거 JSON)</div>
+      <div class="branch" style="margin-top:8px;">
+        <div class="node good">리포트 (점수순 HTML)</div>
+        <div class="node">검증 (사람 판단과 비교)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">09 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/job-fit-scanner" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>
