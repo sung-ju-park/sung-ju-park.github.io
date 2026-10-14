@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중고차 시세 예측 모델 — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>중고차 시세 예측 모델</h1>
+  <p class="tagline">실제 중고차 매물 426,880건을 정제해 시세 예측 모델을 만들고, 점수가 부풀려지지 않는 평가 방식으로 비교한 뒤 80% 시세 구간과 가격 근거를 돌려주는 API로 마무리한 머신러닝 프로젝트</p>
+  <div class="tags">
+    <span class="tag">시세 예측</span>
+    <span class="tag">XGBoost</span>
+    <span class="tag">MLflow</span>
+    <span class="tag">예측 구간</span>
+    <span class="tag">FastAPI</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>2026.10</td></tr>
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>데이터</td><td>Craigslist 미국 중고차 매물 426,880건 (Kaggle 공개 데이터) → 정제 후 187,707대</td></tr>
+      <tr><td>주요 기술</td><td>Python, pandas, scikit-learn, XGBoost, Optuna, MLflow, FastAPI, pytest</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/used-vehicle-price-model" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/used-vehicle-price-model</a></td></tr>
+    </table>
+    <p style="margin-top:16px;"><a class="gh-button" href="used-vehicle-price-report.html" target="_blank" rel="noopener">전체 분석 리포트 보기</a></p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>판매자가 입력한 정보만으로 시세를 맞힐 수 있을까</h2>
+    <p>중고차 매물 데이터는 판매자가 직접 입력한 값이라 가격 미기재(0달러), 자리표시 주행거리, 제각각인 모델명, 같은 차의 반복 게시가 섞여 있습니다. 이 데이터로 '모델·연식별 시세표'보다 정확한 시세를 예측하고, 한 숫자가 아니라 믿을 수 있는 시세 범위와 그 근거까지 보여주는 것이 목표였습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 분석 내용</div>
+    <div class="contribution">
+      <h4>What was done</h4>
+      <ul>
+        <li>정제 규칙 6단계와 모델명 정규화('F150 XLT', 'super duty f-250' → 기본 모델명, 트럭 적재 등급 추출)</li>
+        <li>VIN 기반 중복 판정으로 반복 게시된 매물 187,872건 정리, 둥근 주행거리는 가격까지 같아야 같은 차로 판정</li>
+        <li>시세표 기준선, Ridge, Random Forest(정수 코드·타깃 인코딩), XGBoost(기본·Optuna 튜닝) 비교, 모든 실행 MLflow 기록과 모델 레지스트리 등록</li>
+        <li>SHAP 값으로 가격 결정 요인 해석, 차종·가격대·연식별 오차 분석, 트럭 전용 모델 필요성 검증</li>
+        <li>분위수 회귀와 CQR 보정으로 80% 시세 구간 제공, FastAPI 서빙과 pytest 테스트</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>점수가 너무 잘 나오는 평가 방식</h2>
+    <p>원본 매물의 44%는 딜러가 같은 차를 여러 지역에 반복 게시한 것이었습니다(한 대가 최대 261번). 이를 그대로 두고 매물 단위로 무작위로 나누면 평가 매물의 56%가 학습 데이터에 이미 있는 차가 됩니다. 모델이 시세를 배운 게 아니라 그 차의 가격을 외워서 맞히는 셈입니다.</p>
+    <div class="flow">
+      <div class="node">중복 포함 무작위 분할</div><span class="arrow">→</span>
+      <div class="node warn">평가 매물 56%가 이미 본 차</div><span class="arrow">→</span>
+      <div class="node warn">±20% 적중 80.4%로 부풀려짐</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>VIN으로 같은 차를 묶어 최신 게시물 하나만 남기고, 차 단위로 평가 데이터를 먼저 떼어 두었습니다. 평가 데이터는 모델 선택이 끝난 뒤 한 번만 썼습니다. 같은 모델 설정으로 비교하면 정직한 평가의 ±20% 적중률은 69.5%입니다. 이후 모든 수치는 이 방식으로 쟀습니다.</p>
+    <div class="detail-img"><img src="../assets/uv-leakage.png" alt="평가 방식별 점수 비교"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 Result</div>
+    <p>XGBoost가 시세표 방식 대비 오차율 중앙값을 <b>18.5% → 12.3%</b>, 평균 절대 오차를 <b>$3,712 → $2,434</b>로 줄였고, 실제 가격 ±20% 안에 든 비율은 70.1%입니다.</p>
+    <div class="detail-img"><img src="../assets/uv-models.png" alt="모델별 오차율"></div>
+    <p style="margin-top:16px;">트럭·픽업은 시세표 방식의 오차가 20.4%로 컸지만, 모델이 12.5%로 줄여 차종 가운데 가장 큰 폭(39%)으로 개선했습니다. 트럭만으로 학습한 모델과 전체 모델의 차이는 거의 없어(12.47% 대 12.51%) 하나의 모델로 운영하기로 했습니다.</p>
+    <div class="detail-img"><img src="../assets/uv-segments.png" alt="차종별 오차율"></div>
+    <p style="margin-top:16px;">분위수 회귀만으로 만든 80% 구간은 실제로 75.4%만 담았습니다. CQR 보정으로 80.3%로 맞췄고, 차종별로도 80% 근처를 유지했습니다.</p>
+    <div class="detail-img"><img src="../assets/uv-intervals.png" alt="예측 구간 포함률"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">원본 매물 426,880건</div>
+      <div class="down">↓</div>
+      <div class="node">정제 규칙 · 모델명 정규화 · VIN 중복 제거 → 187,707대</div>
+      <div class="down">↓</div>
+      <div class="node">학습 / 검증 / 보정 / 평가 분리 (차 단위)</div>
+      <div class="down">↓</div>
+      <div class="node">기준선 · Ridge · Random Forest · XGBoost + Optuna  →  MLflow 기록</div>
+      <div class="down">↓</div>
+      <div class="node">분위수 회귀 + CQR 보정 · SHAP 해석 · 오차 분석</div>
+      <div class="branch" style="margin-top:8px;">
+        <div class="node good">FastAPI 시세 예측 API</div>
+        <div class="node">MLflow 모델 레지스트리</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/used-vehicle-price-model" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>
