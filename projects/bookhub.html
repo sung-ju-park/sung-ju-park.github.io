@@ -32,10 +32,10 @@
   <div class="dsec">
     <div class="num">01 Overview</div>
     <table class="overview-table">
-      <tr><td>기간</td><td>2026</td></tr>
+      <tr><td>기간</td><td>2024.08 (KDT 팀 프로젝트)</td></tr>
       <tr><td>인원</td><td>5인 팀 (팀명 P1J4)</td></tr>
-      <tr><td>역할</td><td>도서 검색, AI 추천·요약, 회원가입/로그인, 마이페이지 개발 (본인 담당분)</td></tr>
-      <tr><td>주요 기술</td><td>Node.js, HTML/CSS, MongoDB, LLM</td></tr>
+      <tr><td>역할</td><td>도서 검색, 최근 들어온 책·인기 도서 목록 개발 (본인 담당분)</td></tr>
+      <tr><td>주요 기술</td><td>Node.js, Puppeteer, 서울시 Open API, HTML/CSS, MongoDB, LLM</td></tr>
       <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/BookHub" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/BookHub</a></td></tr>
     </table>
   </div>
@@ -51,27 +51,27 @@
     <div class="contribution">
       <h4>My Contribution</h4>
       <ul>
-        <li>도서 검색 및 도서관별 소장 여부 확인 기능 개발</li>
-        <li>AI 기반 도서 추천·요약 기능 개발</li>
-        <li>회원가입/로그인, 마이페이지(최근 본 책, 정보 수정) 기능 개발</li>
+        <li>강남·강동·마포·영등포 구립 도서관 4곳 통합 도서 검색 및 도서관별 소장 여부 확인 기능 개발</li>
+        <li>'최근 들어온 책'(서울도서관 신착 도서)과 '지금 인기 있는 책'(서울시 도서 대출 순위 Open API) 목록 및 페이지 나누기 기능 개발</li>
+        <li>AI 추천·요약, 회원가입/로그인, 마이페이지는 팀원이 담당</li>
       </ul>
     </div>
   </div>
 
   <div class="dsec">
     <div class="num">04 Technical Challenge</div>
-    <h2>AI 요약이 책의 실제 내용과 다른 정보를 만들어낼 위험</h2>
-    <p>키워드 기반으로 도서를 추천하고 요약을 생성하는 기능에서는, 모델이 실제 책 내용과 무관한 내용을 그럴듯하게 만들어낼 수 있다는 위험이 항상 따라옵니다. 검색·추천 결과가 실제 도서 데이터에 근거하도록 연결하는 것이 핵심 과제였습니다.</p>
+    <h2>처음 구현해 본 페이지 나누기</h2>
+    <p>코딩을 처음 배우며 만든 프로젝트라, 수십 권이 넘는 신착·인기 도서 목록을 한 화면에 모두 띄우지 않고 페이지 단위로 나눠 보여주는 기능을 구현하는 것이 가장 어려웠습니다. 몇 번째 책부터 몇 번째 책까지 보여줄지와 전체 페이지 수를 계산해, 화면의 번호 버튼과 맞춰야 했습니다.</p>
   </div>
 
   <div class="dsec">
     <div class="num">05 Solution</div>
-    <p>도서관 API로 확보한 실제 도서 정보(제목, 저자, 소장 도서관)를 기반으로 검색·추천 로직을 구성하고, 그 위에 AI 요약 기능을 얹는 구조로 설계했습니다. 회원가입/로그인과 마이페이지를 통해 사용자가 최근 검색한 책을 다시 확인할 수 있도록 연결했습니다.</p>
+    <p>서버에서 전체 목록을 가져온 뒤, 요청한 페이지 번호에 맞춰 (페이지 − 1) × 페이지당 개수 위치부터 정해진 개수만 잘라 보내고, 전체 개수를 페이지당 개수로 나눠 전체 페이지 수를 계산해 번호 버튼을 만들었습니다. 도서 검색은 4개 구립 도서관의 검색 페이지를 Puppeteer로 동시에 조회해 결과를 한 화면에 모았습니다.</p>
   </div>
 
   <div class="dsec">
     <div class="num">06 Result</div>
-    <p>서울시 주요 구립 도서관의 도서를 한 번에 검색하고, AI 추천·요약까지 받아볼 수 있는 웹 플랫폼으로 완성했습니다. 로그인, 도서 검색, 상세정보, 마이페이지까지 하나의 흐름으로 연결했습니다.</p>
+    <p>팀원들과 함께 서울시 주요 구립 도서관의 도서를 한 번에 검색하고, 신착·인기 도서와 AI 추천·요약까지 볼 수 있는 웹 플랫폼으로 완성했습니다. 로그인, 도서 검색, 상세정보, 마이페이지까지 하나의 흐름으로 연결했습니다.</p>
     <div class="detail-img">
       <img src="../assets/bookhub-cover.png" alt="Book Hub 프로젝트 표지">
     </div>
@@ -83,7 +83,7 @@
     <div class="arch-flow">
       <div class="node">사용자 — 도서 검색 / 키워드 입력</div>
       <div class="down">↓</div>
-      <div class="node">Node.js 서버 — 도서관 API 연동, 소장 여부 조회</div>
+      <div class="node">Node.js 서버 — 구립 도서관 검색(Puppeteer)·서울시 Open API로 소장 여부·인기 도서 조회</div>
       <div class="down">↓</div>
       <div class="node">MongoDB — 도서 정보 · 사용자 데이터 저장</div>
       <div class="down">↓</div>
