@@ -121,6 +121,27 @@
 <section class="wrap" id="projects">
   <h2 class="section-title">Selected Projects</h2>
 
+  <a class="featured" href="projects/process-anomaly-rca.html">
+    <div>
+      <div class="kicker">FEATURED · Manufacturing AI</div>
+      <h3>공정 이상 탐지 · 근본 원인 분석(RCA)</h3>
+      <p class="desc">공장 센서에 경보가 울리면 진짜 이상인지, 어느 센서부터 볼지, 비슷한 과거 고장은 무엇인지 찾아 점검 보고서로 정리합니다. 정답을 결과보다 먼저 고정해 채점했고, '가장 크게 변한 센서'보다 '가장 먼저 벗어난 센서'가 원인을 더 잘 짚는다는 것을 확인했습니다. 로컬 LLM이 쓴 보고서 문장은 코드로 다시 검사합니다.</p>
+      <span class="cta">분석 과정 자세히 보기</span>
+    </div>
+    <div class="stats">
+      <div class="stat-box">
+        <div class="model">정답 원인 1순위 적중</div>
+        <div class="val">8 / 11</div>
+        <div class="metric-label">SHAP 방식은 5 / 11</div>
+      </div>
+      <div class="stat-box">
+        <div class="model">유사 과거 사례 1순위 적중</div>
+        <div class="val">44% → 78%</div>
+        <div class="metric-label">흔들림 크기 특징 추가 후</div>
+      </div>
+    </div>
+  </a>
+
   <a class="featured" href="projects/corporate-default-prediction.html">
     <div>
       <div class="kicker">FEATURED · Credit Risk</div>

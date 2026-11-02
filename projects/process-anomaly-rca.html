@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공정 이상 탐지 · 근본 원인 분석(RCA) — 박성주</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicon-512.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="name">박성주</span>
+    <a class="back" href="../index.html#projects">← 프로젝트 목록</a>
+  </div>
+</nav>
+
+<header class="wrap detail-hero">
+  <h1>공정 이상 탐지 · 근본 원인 분석(RCA)</h1>
+  <p class="tagline">공장 센서에 경보가 울렸을 때 진짜 이상인지 판단하고, 어느 센서부터 확인해야 하는지, 예전에 비슷한 고장이 있었는지를 찾아 점검 보고서로 정리하는 프로젝트</p>
+  <div class="tags">
+    <span class="tag">이상 탐지</span>
+    <span class="tag">근본 원인 분석</span>
+    <span class="tag">동적 PCA</span>
+    <span class="tag">로컬 LLM</span>
+    <span class="tag">실데이터 검증</span>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="dsec">
+    <div class="num">01 Overview</div>
+    <table class="overview-table">
+      <tr><td>기간</td><td>2026.10</td></tr>
+      <tr><td>인원</td><td>개인</td></tr>
+      <tr><td>데이터</td><td>Tennessee Eastman Process(화학 공정 시뮬레이션, 측정값 41개 + 조작값 11개, 3분 간격, 고장 21종) · SECOM(실제 반도체 공정, lot 1,567개 × 센서 590개, 불량 104건)</td></tr>
+      <tr><td>주요 기술</td><td>Python, scikit-learn, XGBoost, SHAP, statsmodels, Streamlit, Plotly, Ollama(qwen2.5:3b)</td></tr>
+      <tr><td>역할</td><td>프로젝트 방향과 범위 설정, 결과 검토. 설계·코드·분석은 생성형 AI(Claude)와 함께 진행</td></tr>
+      <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/process-anomaly-rca" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/process-anomaly-rca</a> · <a href="https://github.com/sung-ju-park/process-anomaly-rca/blob/main/docs/easy_guide.md" target="_blank" rel="noopener" style="color:var(--accent);">쉽게 읽는 설명</a></td></tr>
+    </table>
+    <div class="detail-img" style="margin-top:20px;"><img src="../assets/rca-monitoring.png" alt="모니터링·원인 분석 대시보드 화면"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">02 Problem</div>
+    <h2>경보가 울린 다음, 어디부터 봐야 하나</h2>
+    <p>공장 설비에는 센서가 수십 개씩 붙어 있고, 이상이 생기면 경보가 울립니다. 그 뒤 담당자는 <b>진짜 이상인지</b>, <b>어느 센서가 원인인지</b>, <b>예전에도 비슷한 일이 있었는지</b>를 로그와 과거 기록을 뒤지며 직접 확인해야 합니다. 이 프로젝트는 이 과정을 자동으로 처리하고, 원인 지목이 실제로 맞았는지를 <b>결과를 보기 전에 정해 둔 정답</b>으로 채점하는 것이 목표였습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">03 분석 내용</div>
+    <div class="contribution">
+      <h4>What was done</h4>
+      <ul>
+        <li>이상 탐지 방법 4가지(PCA, 동적 PCA, Isolation Forest, 오토인코더)를 같은 기준선·같은 평가 방식으로 비교. 기준선은 학습에 쓰지 않은 정상 데이터로 정하고, 오경보율은 또 다른 정상 구간으로 따로 측정</li>
+        <li>센서가 한 번 튈 때마다 경보가 울리지 않도록 '3번 연속 초과' 경보 규칙 적용 (오경보율 2.9% → 0.6%, 대신 약 6분 지연)</li>
+        <li>원인 후보 순위 방법(단변량 z, PCA 잔차 기여도, 재구성 기반 기여도, SHAP, 먼저 벗어난 순서, 두 방법 결합)을 비교. 고장 11종의 정답 원인 변수를 <b>결과를 보기 전에 GitHub 커밋으로 고정</b>하고 그 정답으로만 채점</li>
+        <li>경보 구간의 패턴(평균 이동 + 흔들림 크기)으로 과거 고장 사례를 찾는 유사 사례 검색, 라벨 없이 경보 구간을 묶는 클러스터링</li>
+        <li>원인 후보, 이상 전파 경로, 유사 사례, 점검 항목을 담은 1장짜리 HTML 리포트 자동 생성과 Streamlit 대시보드</li>
+        <li>실제 반도체 데이터(SECOM)에서 '불량 관련 센서'가 진짜 원인 후보인지 시간 흐름을 통제해 검증하고, 불량률이 바뀐 시점을 통계 검정으로 탐지</li>
+        <li>로컬 LLM이 분석 결과를 점검 보고서 문장으로 옮기고, 그 문장을 코드가 실제 분석 결과와 대조해 검사하는 기능 추가</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">04 Technical Challenge</div>
+    <h2>가장 크게 변한 센서는 원인이 아니었다</h2>
+    <p>원인을 찾을 때 흔히 '가장 크게 변한 센서'나 SHAP처럼 '결과에 영향을 많이 준 센서'를 봅니다. 그런데 공장은 자동 제어 장치가 문제가 생긴 곳을 바로 메우려 하기 때문에, 원인 지점의 변화는 작게 보이고 영향을 받은 주변 설비가 오히려 크게 흔들립니다. 실제로 SHAP은 정답 원인을 11종 중 5종만 1순위로 맞혔습니다.</p>
+    <div class="flow">
+      <div class="node">원인 지점에서 이상 발생</div><span class="arrow">→</span>
+      <div class="node">자동 제어가 바로 보정</div><span class="arrow">→</span>
+      <div class="node warn">주변 설비가 더 크게 흔들려 원인처럼 보임</div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">05 Solution</div>
+    <p>크기 대신 <b>정상 범위를 가장 먼저 벗어난 순서</b>(지수가중 이동평균이 정상 대비 3σ를 3번 연속 넘은 시점)로 원인 후보를 세웠습니다. 도미노처럼, 맨 끝이 가장 요란해도 원인은 처음 넘어진 쪽이라는 생각입니다. 이 방법이 정답 원인을 <b>11종 중 8종</b>에서 1순위로 찾아 비교한 방법 중 가장 좋았습니다.</p>
+    <div class="detail-img"><img src="../assets/rca-scoring.png" alt="원인 순위 방법별 정답 채점 결과"></div>
+    <p style="margin-top:16px;">유사 사례 검색은 첫 버전에서 1순위 적중이 44%였습니다. 놓친 고장들은 대부분 '평균은 그대로인데 흔들림만 커지는' 랜덤 변동·밸브 고착형이어서, 흔들림 크기를 특징에 더하고 과거 사례를 여러 구간으로 나눠 저장했습니다. 학습 파일로만 확인한 뒤 테스트를 한 번 다시 돌려 <b>78%</b>(top-3 83%)가 됐고, 첫 버전 결과도 그대로 남겨 두었습니다.</p>
+    <div class="detail-img"><img src="../assets/rca-report.png" alt="자동 생성되는 RCA 리포트"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">06 실데이터 검증</div>
+    <h2>'불량 관련 센서' 25개 중 다시 나타난 센서는 0개</h2>
+    <p>SECOM은 센서 이름이 익명이고 원인 정답이 없는 실제 반도체 공정 데이터입니다. 단순 비교로는 불량과 관련 있어 보이는 센서가 25개 나왔지만, 같은 주 안에서만 비교해 시기 차이를 걸러내니 4개로 줄었고, 뒤 기간에서 다시 확인하니 재현된 센서는 0개였습니다.</p>
+    <div class="flow">
+      <div class="node">단순 비교 25개</div><span class="arrow">→</span>
+      <div class="node">같은 주 안 비교 4개</div><span class="arrow">→</span>
+      <div class="node warn">뒤 기간 재현 0개</div>
+    </div>
+    <p style="margin-top:12px;">이유를 찾아보니 <b>2008-08-21 전후로 불량률이 14.2%에서 4.3%로</b> 떨어져 있었고(순열검정 p=0.003), 이때 값이 크게 바뀐 센서 11개 중 9개가 처음의 '불량 관련 센서'와 겹쳤습니다. 그 센서들은 불량 원인이라기보다 공정 상태가 바뀐 흔적일 가능성이 높습니다. 같은 이유로 데이터를 무작위로 섞어 검증하면 예측 점수(ROC-AUC)가 0.76으로 부풀고, 시간 순서대로 검증하면 0.56에 그쳤습니다. 그래서 결론을 '불량 예측 모델'이 아니라 '변화 시점 감지 → 시점 전후 비교 → 기간별 재검증'으로 바꿨습니다.</p>
+    <div class="detail-img"><img src="../assets/rca-secom.png" alt="SECOM 실데이터 분석 결과"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">07 추가 기능 · 로컬 LLM 점검 보고서</div>
+    <h2>검사 통과율 18/21이었지만, 쓸 수 있는 문장은 없었다</h2>
+    <p>표와 숫자 위주의 리포트를 현장 담당자가 바로 읽을 수 있도록, 로컬 LLM(Ollama, qwen2.5:3b)이 분석 결과를 점검 보고서 문장으로 옮기게 했습니다. 공장 데이터를 외부로 보내지 않도록 노트북 CPU에서만 동작하고, <b>원인 판단은 LLM이 아니라 위에서 채점한 분석 코드</b>가 합니다. LLM이 쓴 문장은 숫자·단위·센서 이름·'가장 먼저' 순서·최상급 표현·점검 목록 등을 코드로 실제 분석 결과와 대조하고, 틀리면 한 번 다시 쓰게 한 뒤 그래도 틀리면 미리 정한 문장으로 대체합니다.</p>
+    <table class="overview-table" style="margin-top:16px;">
+      <tr><td>v1</td><td>분석 결과 JSON을 그대로 입력 → 검사 18/21 통과. 하지만 문장에 <code>XMEAS30</code> 같은 변수 코드와 입력 키 이름이 그대로 남아 현장에서 읽을 수 없는 수준 → 검사 기준이 느슨했음</td></tr>
+      <tr><td>v2</td><td>코드 없는 문장형 입력 + 작성 예시, 검사 규칙 추가 → 읽기는 좋아졌지만 12/21. 실패 대부분이 답이 하나로 정해진 '의심 원인' 칸</td></tr>
+      <tr><td>v3</td><td>정해진 칸(의심 원인·유사 사례)은 코드가 채우고, LLM은 요약·근거만 작성 → <b>17/21</b>, 나머지 4건은 템플릿 문장으로 대체</td></tr>
+    </table>
+    <p style="margin-top:12px;">검사기 자체도 확인했습니다. 정상 문장은 21건 모두 통과시키고, 일부러 틀린 내용을 넣은 문장은 14종 280건을 모두 막았습니다. 다만 검사는 숫자와 이름처럼 코드로 대조할 수 있는 것만 보기 때문에, 어색한 문장까지 걸러내지는 못합니다.</p>
+    <div class="detail-img"><img src="../assets/rca-llm-brief.png" alt="로컬 LLM이 작성한 점검 보고서 초안"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 Result</div>
+    <div class="contribution">
+      <h4>결과 요약</h4>
+      <ul>
+        <li>이상 탐지: 동적 PCA 평균 탐지율 <b>70.8%</b>, 오경보율 <b>0.6%</b>, 탐지 지연 중앙값 <b>39분</b> (Isolation Forest 46.9%)</li>
+        <li>원인 분석: '먼저 벗어난 순서'로 정답 원인 1순위 <b>8/11</b> (SHAP 5/11)</li>
+        <li>유사 과거 사례: 1순위 적중 <b>78%</b>, 3순위 안 83% (첫 버전 44%)</li>
+        <li>SECOM: 무작위 검증 ROC-AUC 0.76 vs 시간순 0.56, 원인 후보 25 → 4 → 0개, 변화 시점 14.2% → 4.3% (p=0.003)</li>
+        <li>로컬 LLM 보고서: 21건 중 17건을 검증 통과한 LLM 문장으로 작성, 1건당 약 34초(노트북 CPU)</li>
+      </ul>
+    </div>
+    <p style="margin-top:16px;"><b>한계</b> — TEP는 시뮬레이션이라 실제 설비의 센서 고장·결측이 없고, 원인 채점 대상이 11종으로 적습니다. 고장 15·21번은 사실상 미탐지입니다. SECOM은 센서 이름이 익명이라 원인 후보를 물리적으로 확인할 수 없습니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">09 Architecture</div>
+    <div class="arch-flow">
+      <div class="node">센서 데이터 (TEP 52개 변수 · 3분 간격)</div>
+      <div class="down">↓</div>
+      <div class="node">동적 PCA 이상 점수  →  3회 연속 기준선 초과 시 경보</div>
+      <div class="down">↓</div>
+      <div class="node">경보 후 1시간 구간: 기여도 + 먼저 벗어난 순서  →  원인 후보 Top 3 · 전파 경로</div>
+      <div class="down">↓</div>
+      <div class="node">시그니처(평균 이동 + 흔들림 크기)  →  유사 과거 사례 검색</div>
+      <div class="down">↓</div>
+      <div class="branch" style="margin-top:8px;">
+        <div class="node good">HTML RCA 리포트 · Streamlit 대시보드</div>
+        <div class="node good">로컬 LLM 점검 보고서 + 코드 검사 · 템플릿 대체</div>
+        <div class="node">SECOM 실데이터 검증</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">10 GitHub</div>
+    <a class="gh-button" href="https://github.com/sung-ju-park/process-anomaly-rca" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+</section>
+
+<footer>© 박성주</footer>
+
+</body>
+</html>
