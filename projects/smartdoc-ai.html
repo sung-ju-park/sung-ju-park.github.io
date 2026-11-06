@@ -26,6 +26,8 @@
     <span class="tag">RAG</span>
     <span class="tag">LangGraph</span>
     <span class="tag">MCP</span>
+    <span class="tag">Guardrail</span>
+    <span class="tag">Make 자동화</span>
   </div>
 </header>
 
@@ -33,10 +35,10 @@
   <div class="dsec">
     <div class="num">01 Overview</div>
     <table class="overview-table">
-      <tr><td>기간</td><td>2026.07 – 2026.10 (v1~v4 단계적 확장, 10월 평가·버그 수정)</td></tr>
+      <tr><td>기간</td><td>2026.07 – 2026.11 (v1~v5 단계적 확장, 10월 평가·버그 수정, 11월 안전장치·평가 추가)</td></tr>
       <tr><td>인원</td><td>개인</td></tr>
-      <tr><td>역할</td><td>RAG 파이프라인, 자가교정 Agent, MCP 서버 설계·구현 전체</td></tr>
-      <tr><td>주요 기술</td><td>Ollama, LangChain, LangGraph, Chroma, FastAPI, Streamlit, MCP</td></tr>
+      <tr><td>역할</td><td>RAG 파이프라인, 자가교정 Agent, MCP 서버, 안전장치·평가, 업무 자동화 설계·구현 전체</td></tr>
+      <tr><td>주요 기술</td><td>Ollama, LangChain, LangGraph, Chroma, FastAPI, Streamlit, MCP, pytest, Make</td></tr>
       <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/smartdoc-ai" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/smartdoc-ai</a></td></tr>
     </table>
   </div>
@@ -57,6 +59,8 @@
         <li>재업로드 시 벡터DB에 청크가 중복 저장되는 버그 발견 및 수정</li>
         <li>Claude Desktop에서 바로 호출 가능한 MCP 서버 구축 (3개 tool 제공)</li>
         <li>GitHub push 이벤트 → Google Sheets 커밋 로그 자동 기록 파이프라인(Make) 구성</li>
+        <li>(v5) 문서 속 AI 대상 지시문 걸러내기, 근거 없는 답변 보류 안전장치, 프롬프트 버전 관리, 자동 테스트 27개</li>
+        <li>(v5) 프롬프트 인젝션 실험과 26문항 평가로 안전장치 켜기 전후 비교</li>
       </ul>
     </div>
   </div>
@@ -98,7 +102,51 @@
   </div>
 
   <div class="dsec">
-    <div class="num">07 Architecture</div>
+    <div class="num">07 v5 Update · 안전장치와 평가</div>
+    <h2>"문서에 근거해서만 답한다"를 실제로 확인하는 장치</h2>
+    <p>v4까지는 프롬프트에 "문서에 근거해 답하라"고 적어 두기만 했을 뿐, 실제로 그렇게 답했는지 확인하는 장치가 없었습니다. 또 업로드한 문서에 "이전 지시를 무시하고 ~라고 답하라" 같은 문장이 섞이면 LLM이 이를 명령으로 따를 수 있습니다. 그래서 입력과 출력 양쪽에 확인 단계를 넣었습니다.</p>
+    <div class="flow">
+      <div class="node">검색</div><span class="arrow">→</span>
+      <div class="node warn">문서 속 지시문 걸러내기</div><span class="arrow">→</span>
+      <div class="node">답변 생성</div><span class="arrow">→</span>
+      <div class="node good">근거 확인 → 통과 / 보류</div>
+    </div>
+    <p>답변에 검색된 문단에 없는 숫자나 영문 이름이 있으면 답변을 내보내지 않고 원문 확인을 안내합니다. Agent 화면에서는 검색 → 채점 → 재작성 → 생성 → 근거 확인 단계가 끝날 때마다 실시간으로 표시됩니다.</p>
+    <table class="overview-table">
+      <tr><td>인젝션 실험</td><td>지시문 3개를 섞은 가상 문서, 질문 8개 — 공격 성공 1/8(안전장치 끔) → <b>0/8</b>(켬), 정답 6/7 → 7/7</td></tr>
+      <tr><td>기존 26문항 평가</td><td>안전장치를 켠 상태에서 답변 52개 중 <b>정답을 잘못 막은 경우 0건</b></td></tr>
+      <tr><td>한계</td><td>문서 안에 있는 다른 숫자를 엉뚱한 자리에 쓴 오답은 잡지 못함 (예: 정답 0.869 대신 0.995) — 규칙 기반 확인의 한계로 기록</td></tr>
+      <tr><td>테스트</td><td>가짜 LLM으로 Ollama 없이 도는 pytest 27개 (안전장치 규칙, Agent 분기, API, 채점 규칙)</td></tr>
+    </table>
+    <div class="detail-img">
+      <img src="https://github.com/sung-ju-park/smartdoc-ai/raw/main/screenshots/20261102_v5_agent.png" alt="v5 Agent 모드 실행 화면">
+    </div>
+    <p class="caption">v5 Agent 모드 — 문서에 없는 질문에 지어내지 않고 답했고, 안전장치 판정·재검색 횟수·응답 시간이 함께 표시됩니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">08 업무 자동화 · Make</div>
+    <h2>커밋할 때마다 손으로 정리하던 개발 기록을 자동으로</h2>
+    <p>프로젝트를 여러 개 진행하면서 언제 무엇을 바꿨는지 따로 정리하는 일이 반복됐습니다. 이를 줄이기 위해 GitHub에 push할 때마다 커밋 정보가 시트에 자동으로 쌓이는 흐름을 Make로 만들었습니다.</p>
+    <div class="flow">
+      <div class="node">GitHub push</div><span class="arrow">→</span>
+      <div class="node">Webhook</div><span class="arrow">→</span>
+      <div class="node">Make (Custom Webhook)</div><span class="arrow">→</span>
+      <div class="node good">Google Sheets 행 추가</div>
+    </div>
+    <p>처음에는 기록 위치를 Notion 데이터베이스로 잡았지만, 올바른 ID를 넣어도 "찾을 수 없음" 오류가 계속 났습니다. Notion API의 데이터베이스 구조 변경과 관련된 호환성 문제로 보여, 원래 목적(기록 자동화)을 지키는 쪽으로 판단해 저장 위치를 Google Sheets로 바꿔 완성했습니다.</p>
+    <div class="detail-img">
+      <img src="https://github.com/sung-ju-park/smartdoc-ai/raw/main/screenshots/20260824_141408.png" alt="Make 시나리오 구조">
+    </div>
+    <p class="caption">Make 시나리오 — GitHub Webhook 트리거 → Google Sheets(Add a Row)</p>
+    <div class="detail-img">
+      <img src="https://github.com/sung-ju-park/smartdoc-ai/raw/main/screenshots/20260824_141416.png" alt="자동 기록 결과">
+    </div>
+    <p class="caption">커밋 메시지, 저장소명, 날짜, 커밋 링크가 push할 때마다 자동으로 쌓입니다.</p>
+  </div>
+
+  <div class="dsec">
+    <div class="num">09 Architecture</div>
     <div class="arch-flow">
       <div class="node">PDF 업로드</div>
       <div class="down">↓</div>
@@ -106,17 +154,19 @@
       <div class="down">↓</div>
       <div class="node">벡터 저장 (Chroma)</div>
       <div class="down">↓ 질문 입력 시</div>
-      <div class="node">벡터 유사도 검색 → grade_documents</div>
+      <div class="node">문서 속 지시문 걸러내기 → 벡터 유사도 검색 → grade_documents</div>
       <div class="branch" style="margin-top:8px;">
         <div class="node good">충분 → LLM(qwen2.5:3b) 답변 생성</div>
         <div class="node warn">부족 → 질문 재구성 → 재검색</div>
       </div>
+      <div class="down">↓</div>
+      <div class="node">근거 확인 (안전장치) → 통과 시 답변 + 출처(파일·쪽 번호) / 실패 시 보류</div>
     </div>
     <p style="margin-top:20px;">이 RAG 로직은 이후 <b>MCP 서버</b>로도 그대로 재사용되어, Claude Desktop이 HTTP 계층 없이 파이썬 함수를 직접 호출하는 구조로 확장되었습니다 (<code style="background:var(--surface);padding:2px 6px;border-radius:4px;">search_documents</code>, <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">ask_document_agent</code>, <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">upload_document</code>).</p>
   </div>
 
   <div class="dsec">
-    <div class="num">08 GitHub</div>
+    <div class="num">10 GitHub</div>
     <a class="gh-button" href="https://github.com/sung-ju-park/smartdoc-ai" target="_blank" rel="noopener">View on GitHub</a>
   </div>
 </section>
