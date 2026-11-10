@@ -146,7 +146,7 @@
     <div>
       <div class="kicker">FEATURED · LLM Agent</div>
       <h3>SmartDoc AI · 문서 질의응답 Agent</h3>
-      <p class="desc">로컬 LLM으로 문서를 검색해 답하고, 검색 결과가 부족하면 질문을 다시 써서 재검색하는 Agent입니다. 문서 속에 섞인 AI 대상 지시문을 걸러내고, 답변에 문서에 없는 숫자나 이름이 있으면 답을 보류하는 안전장치를 넣은 뒤 실험으로 효과와 한계를 확인했습니다.</p>
+      <p class="desc">로컬 LLM으로 문서를 검색해 답하고, 검색 결과가 부족하면 질문을 다시 써서 재검색하는 Agent입니다. 문서 속에 섞인 AI 대상 지시문을 걸러내고, 답변에 문서에 없는 숫자나 이름이 있으면 답을 보류하는 안전장치를 넣은 뒤 실험으로 효과와 한계를 확인했습니다. 같은 로직을 MCP 서버(도구 3개)로 감싸 Claude Desktop에서도 바로 쓸 수 있게 했습니다.</p>
       <span class="cta">설계와 실험 자세히 보기</span>
     </div>
     <div class="stats">
@@ -274,7 +274,7 @@
       <div class="thumb"><img src="assets/job-fit-scanner-thumb.png" alt="Job Fit Scanner 실행 결과 화면"></div>
       <div class="body">
         <h3>Job Fit Scanner</h3>
-        <p class="desc">조건 검색 결과 403건을 자동으로 모아 LLM이 내 이력과의 적합도를 평가하고 상위 30건만 보여주는 도구. AI 판단을 사람 판단 20건과 비교해 일치율 75%를 확인.</p>
+        <p class="desc">조건 검색 결과 403건을 자동으로 모아 LLM이 내 이력과의 적합도를 평가하고 상위 30건만 보여주는 도구. SQLite 3개 테이블로 이미 평가한 공고는 SQL로 걸러 새 공고만 평가. AI 판단을 사람 판단 20건과 비교해 일치율 75%를 확인.</p>
         <span class="cta">자세히 보기</span>
       </div>
     </a>

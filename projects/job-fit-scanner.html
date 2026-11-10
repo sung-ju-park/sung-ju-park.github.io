@@ -26,6 +26,7 @@
     <span class="tag">LLM 평가</span>
     <span class="tag">크롤링</span>
     <span class="tag">검증</span>
+    <span class="tag">SQL</span>
   </div>
 </header>
 
@@ -36,7 +37,7 @@
       <tr><td>기간</td><td>2026.10</td></tr>
       <tr><td>인원</td><td>개인</td></tr>
       <tr><td>역할</td><td>문제 정의, 설계 판단, 검증 전체. 구현은 ChatGPT·Claude와 함께 진행</td></tr>
-      <tr><td>주요 기술</td><td>Python, requests, BeautifulSoup, Tesseract OCR, Gemini API, SQLite</td></tr>
+      <tr><td>주요 기술</td><td>Python, requests, BeautifulSoup, Tesseract OCR, Gemini API, SQLite(SQL)</td></tr>
       <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/job-fit-scanner" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/job-fit-scanner</a></td></tr>
     </table>
   </div>
@@ -122,6 +123,19 @@
         <div class="node">검증 (사람 판단과 비교)</div>
       </div>
     </div>
+
+    <h2 style="margin-top:36px;">데이터는 SQLite 3개 테이블로 나눠 관리했습니다</h2>
+    <p>매일 돌리는 도구라, 같은 공고를 다시 수집하거나 다시 평가하지 않는 것이 중요했습니다. 그래서 수집한 공고, AI 평가 결과, 내 판단을 테이블로 나누고 필요한 작업은 SQL로 골라냈습니다.</p>
+    <table class="overview-table" style="margin-top:16px;">
+      <tr><td>postings</td><td>공고 원문과 사전 필터 결과. 공고 주소를 기본키로 둬 같은 공고가 두 번 쌓이지 않음</td></tr>
+      <tr><td>evaluations</td><td>AI 평가 점수·근거. (공고, 모델)을 묶어 기본키로 둬 같은 공고를 모델별로 따로 저장하고 비교</td></tr>
+      <tr><td>labels</td><td>검증용으로 직접 판단한 20건</td></tr>
+    </table>
+    <table class="overview-table" style="margin-top:16px;">
+      <tr><td>새 공고만 평가</td><td><code style="background:var(--surface);padding:2px 6px;border-radius:4px;">NOT IN (SELECT url FROM evaluations WHERE model = ?)</code>로 이미 평가한 공고를 빼서, 매일 돌려도 새로 올라온 공고만 API로 보냄</td></tr>
+      <tr><td>잘린 공고만 재평가</td><td><code style="background:var(--surface);padding:2px 6px;border-radius:4px;">LENGTH(raw_text) &gt; ?</code> 조건으로 본문이 길어 잘렸던 공고만 골라 다시 평가 (위 05 Solution의 27건)</td></tr>
+      <tr><td>리포트·통계</td><td>평가와 공고를 JOIN해 점수순 리포트를 만들고, GROUP BY로 모델별 평가 건수와 평균 점수를 집계</td></tr>
+    </table>
   </div>
 
   <div class="dsec">
