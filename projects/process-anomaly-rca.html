@@ -26,6 +26,7 @@
     <span class="tag">근본 원인 분석</span>
     <span class="tag">동적 PCA</span>
     <span class="tag">로컬 LLM</span>
+    <span class="tag">잔존수명 예측</span>
     <span class="tag">실데이터 검증</span>
   </div>
 </header>
@@ -34,9 +35,9 @@
   <div class="dsec">
     <div class="num">01 Overview</div>
     <table class="overview-table">
-      <tr><td>기간</td><td>2026.10</td></tr>
+      <tr><td>기간</td><td>2026.10 (잔존수명 예측 추가 2026.11)</td></tr>
       <tr><td>인원</td><td>개인</td></tr>
-      <tr><td>데이터</td><td>Tennessee Eastman Process(화학 공정 시뮬레이션, 측정값 41개 + 조작값 11개, 3분 간격, 고장 21종) · SECOM(실제 반도체 공정, lot 1,567개 × 센서 590개, 불량 104건)</td></tr>
+      <tr><td>데이터</td><td>Tennessee Eastman Process(화학 공정 시뮬레이션, 측정값 41개 + 조작값 11개, 3분 간격, 고장 21종) · SECOM(실제 반도체 공정, lot 1,567개 × 센서 590개, 불량 104건) · NASA C-MAPSS FD001(터보팬 엔진 시뮬레이션, 학습 100대 · 평가 100대, 센서 21개)</td></tr>
       <tr><td>주요 기술</td><td>Python, scikit-learn, XGBoost, SHAP, statsmodels, Streamlit, Plotly, Ollama(qwen2.5:3b)</td></tr>
       <tr><td>역할</td><td>프로젝트 방향과 범위 설정, 결과 검토. 설계·코드·분석은 생성형 AI(Claude)와 함께 진행</td></tr>
       <tr><td>GitHub</td><td><a href="https://github.com/sung-ju-park/process-anomaly-rca" target="_blank" rel="noopener" style="color:var(--accent);">sung-ju-park/process-anomaly-rca</a> · <a href="https://github.com/sung-ju-park/process-anomaly-rca/blob/main/docs/easy_guide.md" target="_blank" rel="noopener" style="color:var(--accent);">쉽게 읽는 설명</a></td></tr>
@@ -112,7 +113,22 @@
   </div>
 
   <div class="dsec">
-    <div class="num">08 Result</div>
+    <div class="num">08 추가 · 잔존수명(RUL) 예측</div>
+    <h2>엔진이 성능 한계까지 몇 번 더 비행할 수 있나</h2>
+    <p>NASA 터보팬 엔진 시뮬레이션 데이터(FD001, 고압 압축기 열화 1종)로, 엔진이 성능 한계에 닿을 때까지 남은 비행 사이클 수를 예측했습니다. 화학 공장(TEP)과는 다른 시스템이고, 위의 이상 탐지 방법을 다시 썼습니다. 평가 기준과 가설 5개를 평가용 데이터를 돌리기 전에 커밋하고, 평가는 한 번만 했습니다. 기준을 정하기 전 계획 단계에서 평가용 데이터로 빠른 실험을 한 번 돌린 사실도 기준 파일에 함께 적었습니다.</p>
+    <table class="overview-table" style="margin-top:16px;">
+      <tr><td>XGBoost, 상한 125</td><td>평가용 엔진 100대 RMSE <b>13.4</b> (부트스트랩 95% 구간 10.8~16.0), 고장 임박(남은 수명 30 이하) 엔진 <b>3.5</b>. Ridge 18.3, 상수 43.1</td></tr>
+      <tr><td>실패 실험 B</td><td>상한을 교차검증으로 고르니 150이 골라져 16.5로 더 나빴음. 검증 시점의 12%가 남은 수명 145를 넘어 선택을 좌우한 것으로 봄. 결과를 본 뒤에도 기준은 바꾸지 않음</td></tr>
+      <tr><td>실패 실험 C·D</td><td>이상 탐지로 열화 경보를 먼저 잡고 그 뒤부터 수명을 세는 아이디어. 경보가 늦어(학습 엔진 기준 고장 전 중앙값 54사이클) 43.3~44.7로 짐. 고장 임박 엔진 3대를 26~36사이클 늦게 예측한 것이 가장 위험한 실패</td></tr>
+      <tr><td>틀린 가설 H5</td><td>문헌을 보고 먼저 반응할 센서 5개를 예상했지만 100대 중 44대에서만 맞음. 목록에 없던 코어 회전수 센서가 먼저 벗어난 엔진이 많았음</td></tr>
+    </table>
+    <p style="margin-top:12px;">점 예측은 58%가 수명을 실제보다 길게 봤습니다. 80% 예측 구간의 하한을 쓰면 이 비율이 13%로 줄지만, 정비가 중앙값 10.5사이클 앞당겨집니다. 미래 값 누수를 막는 테스트를 포함한 테스트 14개를 두었고, 기준 파일만 보고 새로 짠 코드로 같은 결과(13.39)가 나오는지 확인했습니다(AI 코딩 도구로 작성).</p>
+    <div class="detail-img"><img src="../assets/rca-rul-trajectories.png" alt="평가용 엔진 3대의 잔존수명 예측 궤적"></div>
+    <div class="detail-img"><img src="../assets/rca-rul-errors.png" alt="실제 잔존수명에 따른 예측 오차"></div>
+  </div>
+
+  <div class="dsec">
+    <div class="num">09 Result</div>
     <div class="contribution">
       <h4>결과 요약</h4>
       <ul>
@@ -121,13 +137,14 @@
         <li>유사 과거 사례: 1순위 적중 <b>78%</b>, 3순위 안 83% (첫 버전 44%)</li>
         <li>SECOM: 무작위 검증 ROC-AUC 0.76 vs 시간순 0.56, 원인 후보 25 → 4 → 0개, 변화 시점 14.2% → 4.3% (p=0.003)</li>
         <li>로컬 LLM 보고서: 21건 중 17건을 검증 통과한 LLM 문장으로 작성, 1건당 약 34초(노트북 CPU)</li>
+        <li>잔존수명 예측(C-MAPSS FD001): XGBoost RMSE <b>13.4</b>, 고장 임박 엔진 <b>3.5</b>, 가설 5개 중 4개 맞음</li>
       </ul>
     </div>
-    <p style="margin-top:16px;"><b>한계</b> — TEP는 시뮬레이션이라 실제 설비의 센서 고장·결측이 없고, 원인 채점 대상이 11종으로 적습니다. 고장 15·21번은 사실상 미탐지입니다. SECOM은 센서 이름이 익명이라 원인 후보를 물리적으로 확인할 수 없습니다.</p>
+    <p style="margin-top:16px;"><b>한계</b> — TEP는 시뮬레이션이라 실제 설비의 센서 고장·결측이 없고, 원인 채점 대상이 11종으로 적습니다. 고장 15·21번은 사실상 미탐지입니다. SECOM은 센서 이름이 익명이라 원인 후보를 물리적으로 확인할 수 없습니다. 잔존수명 예측은 운항 조건이 하나인 FD001만 썼고, 딥러닝 비교와 물리 모델 연계는 하지 않았습니다.</p>
   </div>
 
   <div class="dsec">
-    <div class="num">09 Architecture</div>
+    <div class="num">10 Architecture</div>
     <div class="arch-flow">
       <div class="node">센서 데이터 (TEP 52개 변수 · 3분 간격)</div>
       <div class="down">↓</div>
@@ -146,7 +163,7 @@
   </div>
 
   <div class="dsec">
-    <div class="num">10 GitHub</div>
+    <div class="num">11 GitHub</div>
     <a class="gh-button" href="https://github.com/sung-ju-park/process-anomaly-rca" target="_blank" rel="noopener">View on GitHub</a>
   </div>
 </section>
